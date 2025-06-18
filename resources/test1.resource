@@ -42,7 +42,8 @@ Variables         ${EXECDIR}/config.yaml
 
 *** Variables ***
 ${url}            ${app.base_url}
-@{chrome_args}      --headless    --no-sandbox    --disable-dev-shm-usage    --remote-debugging-port=9222
+#@{chrome_args}      --headless    --no-sandbox    --disable-dev-shm-usage    --remote-debugging-port=9222
+@{chrome_args}    --headless    --no-sandbox    --disable-dev-shm-usage    --remote-debugging-port=9222    --user-data-dir=/tmp/chrome-user-data
 
 *** Keywords ***
 Launch Application
