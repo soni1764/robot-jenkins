@@ -97,7 +97,7 @@ RUN pip install --no-cache-dir \
 WORKDIR /testing
 
 # Copy your test files (optional if you're building with local tests)
- COPY . /testing
+COPY . /testing
 
 # Default command (can be overridden in docker run)
 CMD ["robot", "--outputdir", "results", "tests/"]
