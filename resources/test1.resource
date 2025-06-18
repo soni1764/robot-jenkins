@@ -16,6 +16,25 @@
 #    Sleep    2
 #    Title Should Be    Google
 
+#*** Settings ***
+#Library           SeleniumLibrary
+#
+#Variables         ${EXECDIR}/config.yaml
+#
+#*** Variables ***
+#${url}            ${app.base_url}
+#@{chrome_args}    --headless    --no-sandbox    --disable-dev-shm-usage    --remote-debugging-port=9222
+#
+#*** Keywords ***
+#Launch Application
+#    &{options}=    Create Dictionary    args=${chrome_args}
+#    &{caps}=       Create Dictionary    goog:chromeOptions=${options}
+#    Open Browser    ${url}    chrome    desired_capabilities=${caps}
+#    Maximize Browser Window
+#    Sleep    2
+#    Title Should Be    Google
+
+
 *** Settings ***
 Library           SeleniumLibrary
 
@@ -23,13 +42,15 @@ Variables         ${EXECDIR}/config.yaml
 
 *** Variables ***
 ${url}            ${app.base_url}
-@{chrome_args}    --headless    --no-sandbox    --disable-dev-shm-usage    --remote-debugging-port=9222
+@{chrome_args}      --headless    --no-sandbox    --disable-dev-shm-usage    --remote-debugging-port=9222
 
 *** Keywords ***
 Launch Application
-    &{options}=    Create Dictionary    args=${chrome_args}
-    &{caps}=       Create Dictionary    goog:chromeOptions=${options}
-    Open Browser    ${url}    chrome    desired_capabilities=${caps}
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    FOR    ${arg}    IN    @{chrome_args}
+        Call Method    ${options}    add_argument    ${arg}
+    END
+    Open Browser    ${url}    chrome    options=${options}
     Maximize Browser Window
     Sleep    2
     Title Should Be    Google
