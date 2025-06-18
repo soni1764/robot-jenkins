@@ -1,35 +1,30 @@
-# Use official lightweight Python image
 FROM python:3.11-slim
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    wget unzip curl gnupg2 fonts-liberation libnss3 libatk-bridge2.0-0 libxss1 libasound2 libgtk-3-0 libgbm1 libxshmfence1 xvfb \
+    wget unzip curl gnupg lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome (stable version)
+# Install Google Chrome (version 136.0.7103.113-1)
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get update && \
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
 
-# Install ChromeDriver (compatible with Chrome 126)
-ENV CHROMEDRIVER_VERSION=126.0.6478.114
-RUN wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
+# Install ChromeDriver (version 136.0.7103.19)
+RUN wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/136.0.7103.19/chromedriver_linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin && \
     chmod +x /usr/local/bin/chromedriver && \
     rm /tmp/chromedriver.zip
 
-# Install Python dependencies
+# Install Robot Framework and SeleniumLibrary
 RUN pip install --no-cache-dir robotframework selenium robotframework-seleniumlibrary
 
-# Set working directory
+# Set working directory and copy project files
 WORKDIR /testing
-
-# Copy project files into container
 COPY . /testing
 
-# Set environment variable for browser
+# Set environment variable for Robot Framework
 ENV ROBOT_BROWSER=chrome
 
-# Run tests and output results to /testing/results
+# Default command to run tests
 CMD ["robot", "--outputdir", "results", "tests/"]
