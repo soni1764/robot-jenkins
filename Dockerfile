@@ -23,8 +23,8 @@ RUN CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_
     chmod +x /usr/local/bin/chromedriver && \
     rm /tmp/chromedriver.zip
 
-# Install Robot Framework and SeleniumLibrary
-RUN pip install --no-cache-dir robotframework selenium robotframework-seleniumlibrary
+# Install Robot Framework, SeleniumLibrary, and PyYAML
+RUN pip install --no-cache-dir robotframework selenium robotframework-seleniumlibrary pyyaml
 
 # Create working directory and copy your test files
 WORKDIR /testing
