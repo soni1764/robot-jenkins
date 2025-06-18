@@ -1,0 +1,11 @@
+jenkins:
+  url: "http://localhost:8081"
+  user: "admin"
+  password: "admin"
+
+app:
+  environment: "dev"          # could be 'dev', 'qa', 'staging', 'prod'
+  base_url: "https://www.google.com/"
+  debug: true
+  retries: 3
+  timeout: 30                 # in seconds
