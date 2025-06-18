@@ -1,38 +1,40 @@
-FROM python:3.11-slim-bookworm
+FROM python:3.11-bullseye
 
-# Add contrib and non-free repos (if needed)
-RUN sed -i 's/main/main contrib non-free/' /etc/apt/sources.list
-
-# Update and install dependencies required by Chrome
+# Install dependencies for Chrome and general utilities
 RUN apt-get update && apt-get install -y \
-    wget unzip curl gnupg lsb-release \
-    fonts-liberation libappindicator3-1 libatk-bridge2.0-0 libatk1.0-0 libcups2 \
-    libdbus-1-3 libdrm2 libx11-6 libxcomposite1 libxdamage1 libxext6 libxfixes3 \
-    libxrandr2 libxrender1 libxss1 libxtst6 libpango-1.0-0 libvulkan1 xdg-utils \
-    libatspi2.0-0 libcairo2 libgtk-3-0 libnspr4 libnss3 libxkbcommon0 \
+    wget unzip curl gnupg lsb-release fonts-liberation \
+    libappindicator3-1 libatk-bridge2.0-0 libatk1.0-0 libcups2 \
+    libdbus-1-3 libdrm2 libx11-6 libxcomposite1 libxdamage1 libxext6 \
+    libxfixes3 libxrandr2 libxrender1 libxss1 libxtst6 libpango-1.0-0 \
+    libvulkan1 xdg-utils libatspi2.0-0 libcairo2 libgtk-3-0 libnspr4 libnss3 \
+    libxkbcommon0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome stable
+# Download and install Google Chrome Stable
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm google-chrome-stable_current_amd64.deb
+    apt-get update && apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver (match Chrome version)
-RUN CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE_136) && \
+# Download and install ChromeDriver matching Chrome version
+RUN CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
     wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver && \
     rm /tmp/chromedriver.zip
 
 # Install Robot Framework and SeleniumLibrary
 RUN pip install --no-cache-dir robotframework selenium robotframework-seleniumlibrary
 
-# Create results directory
-RUN mkdir -p /testing/results
-
+# Create working directory and copy your test files
 WORKDIR /testing
 COPY . /testing
 
+# Create results directory so it exists before test run
+RUN mkdir -p /testing/results
+
+# Environment variable to use Chrome for browser testing
 ENV ROBOT_BROWSER=chrome
 
+# Default command to run Robot tests, outputting to 'results' folder
 CMD ["robot", "--outputdir", "results", "tests/"]
