@@ -16,9 +16,12 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     rm google-chrome-stable_current_amd64.deb && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install ChromeDriver matching Chrome version
-RUN CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" && \
+# Install ChromeDriver matching installed Chrome version
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+') && \
+    echo "Detected Chrome version: $CHROME_VERSION" && \
+    CHROMEDRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") && \
+    echo "Matching ChromeDriver version: $CHROMEDRIVER_VERSION" && \
+    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver && \
     rm /tmp/chromedriver.zip
@@ -33,8 +36,9 @@ COPY . /testing
 # Create results directory so it exists before test run
 RUN mkdir -p /testing/results
 
-# Environment variable to use Chrome for browser testing
+# Environment variable for Chrome options to run in Docker container smoothly
 ENV ROBOT_BROWSER=chrome
+ENV ROBOT_CHROME_OPTIONS="--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080"
 
-# Default command to run Robot tests, outputting to 'results' folder
-CMD ["robot", "--outputdir", "results", "tests/"]
+# Default command to run Robot tests in /testing/tests/ folder, output to /testing/results
+CMD ["robot", "--outputdir", "results", "--variable", "chrome_options:${ROBOT_CHROME_OPTIONS}", "tests/"]
