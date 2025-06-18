@@ -41,12 +41,27 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     rm google-chrome-stable_current_amd64.deb && \
     rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver 137.0.7151.15
-RUN wget https://chromedriver.storage.googleapis.com/137.0.7151.15/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/local/bin/ && \
+## Install ChromeDriver 137.0.7151.15
+#RUN wget https://chromedriver.storage.googleapis.com/137.0.7151.15/chromedriver_linux64.zip && \
+#    unzip chromedriver_linux64.zip && \
+#    mv chromedriver /usr/local/bin/ && \
+#    chmod +x /usr/local/bin/chromedriver && \
+#    rm chromedriver_linux64.zip
+
+# Detect Chrome version and download matching ChromeDriver
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+') && \
+    CHROME_DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") && \
+    if [ -z "$CHROME_DRIVER_VERSION" ]; then \
+      # Fallback to major.minor version if full version not found (common issue) \
+      CHROME_MAJOR_MINOR=$(echo $CHROME_VERSION | cut -d. -f1-2); \
+      CHROME_DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_MINOR"); \
+    fi && \
+    echo "Chrome version: $CHROME_VERSION" && \
+    echo "ChromeDriver version: $CHROME_DRIVER_VERSION" && \
+    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver && \
-    rm chromedriver_linux64.zip
+    rm /tmp/chromedriver.zip
 
 # Install Robot Framework, SeleniumLibrary, PyYAML, and selenium itself
 COPY requirements.txt .
