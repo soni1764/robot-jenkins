@@ -1,4 +1,4 @@
-robotframework
-robotframework-seleniumlibrary
-selenium
+robotframework==6.1
+robotframework-seleniumlibrary==6.1.1
+selenium==4.14.0
 pyyaml

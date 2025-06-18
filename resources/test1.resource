@@ -1,12 +1,29 @@
-*** Settings ***
-Library    SeleniumLibrary
+#*** Settings ***
+#Library    SeleniumLibrary
+#
+#Variables    ${EXECDIR}/config.yaml
+#
+#*** Variables ***
+#${url}    ${app.base_url}
+#${chrome_options}    --headless --no-sandbox --disable-dev-shm-usage --remote-debugging-port=9222
+#
+#
+#*** Keywords ***
+#Launch Application
+#    Log    ${url}
+#    Open Browser    ${url}    chrome    options=${chrome_options}
+#    Maximize Browser Window
+#    Sleep    2
+#    Title Should Be    Google
 
-Variables    ${EXECDIR}/config.yaml
+*** Settings ***
+Library           SeleniumLibrary
+
+Variables         ${EXECDIR}/config.yaml
 
 *** Variables ***
-${url}    ${app.base_url}
+${url}            ${app.base_url}
 ${chrome_options}    --headless --no-sandbox --disable-dev-shm-usage --remote-debugging-port=9222
-
 
 *** Keywords ***
 Launch Application
