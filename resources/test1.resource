@@ -5,7 +5,7 @@ Variables    ${EXECDIR}/config.yaml
 
 *** Variables ***
 ${url}    ${app.base_url}
-${chrome_options}    --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080
+${chrome_options}    --headless --no-sandbox --disable-dev-shm-usage --remote-debugging-port=9222
 
 
 *** Keywords ***

@@ -16,8 +16,8 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     rm google-chrome-stable_current_amd64.deb && \
     rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver matching installed Chrome version (major.minor)
-RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+') && \
+# Install ChromeDriver matching Chrome version (major.minor)
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+' | head -1) && \
     echo "Detected Chrome version (major.minor): $CHROME_VERSION" && \
     CHROMEDRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") && \
     echo "Matching ChromeDriver version: $CHROMEDRIVER_VERSION" && \
@@ -26,7 +26,7 @@ RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+') && \
     chmod +x /usr/local/bin/chromedriver && \
     rm /tmp/chromedriver.zip
 
-# Install Robot Framework, SeleniumLibrary, and PyYAML
+# Install Robot Framework, SeleniumLibrary, PyYAML, and selenium itself
 RUN pip install --no-cache-dir robotframework selenium robotframework-seleniumlibrary pyyaml
 
 # Create working directory and copy your test files
@@ -36,8 +36,11 @@ COPY . /testing
 # Create results directory so it exists before test run
 RUN mkdir -p /testing/results
 
-# Environment variable to use Chrome for browser testing
+# Set environment variable for Robot tests to use Chrome
 ENV ROBOT_BROWSER=chrome
+
+# Expose no sandbox and headless flags via environment variable for your Robot tests
+ENV ROBOT_OPTIONS="--headless --no-sandbox --disable-dev-shm-usage --remote-debugging-port=9222"
 
 # Default command to run Robot tests, outputting to 'results' folder
 CMD ["robot", "--outputdir", "results", "tests/"]
