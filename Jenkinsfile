@@ -36,19 +36,35 @@ pipeline {
             }
         }
 
+//         stage('Run Robot Tests in Docker') {
+//             steps {
+//                 script {
+//                     def dockerResultsPath = ABS_RESULTS_DIR.replace('\\', '/').replace('C:', '/c')
+//
+//                     bat """
+//                     docker run --rm --name %CONTAINER_NAME% ^
+//                         -v "${dockerResultsPath}:/testing/results" ^
+//                         %IMAGE_NAME% robot --outputdir results tests/
+//                     """
+//                 }
+//             }
+//         }
+
         stage('Run Robot Tests in Docker') {
             steps {
                 script {
                     def dockerResultsPath = ABS_RESULTS_DIR.replace('\\', '/').replace('C:', '/c')
 
                     bat """
-                    docker run --rm --name %CONTAINER_NAME% ^
-                        -v "${dockerResultsPath}:/testing/results" ^
-                        %IMAGE_NAME% robot --outputdir results tests/
+                        docker rm -f %CONTAINER_NAME% || echo Container not found
+                        docker run --rm --name %CONTAINER_NAME% ^
+                            -v "${dockerResultsPath}:/testing/results" ^
+                            %IMAGE_NAME% robot --outputdir results tests/
                     """
                 }
             }
         }
+
 
         stage('Publish Robot Framework Report') {
             steps {
