@@ -21,12 +21,6 @@ pipeline {
             }
         }
 
-//         stage('Create Results Directory') {
-//             steps {
-//                 bat "mkdir %RESULTS_DIR%"
-//             }
-//         }
-
         stage('Clean & Create Results Directory') {
             steps {
                 bat '''
@@ -35,20 +29,6 @@ pipeline {
                 '''
             }
         }
-
-//         stage('Run Robot Tests in Docker') {
-//             steps {
-//                 script {
-//                     def dockerResultsPath = ABS_RESULTS_DIR.replace('\\', '/').replace('C:', '/c')
-//
-//                     bat """
-//                     docker run --rm --name %CONTAINER_NAME% ^
-//                         -v "${dockerResultsPath}:/testing/results" ^
-//                         %IMAGE_NAME% robot --outputdir results tests/
-//                     """
-//                 }
-//             }
-//         }
 
         stage('Run Robot Tests in Docker') {
             steps {
