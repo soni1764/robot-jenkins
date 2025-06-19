@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url: 'https://github.com/soni1764/robot-jenkins'
+                git branch: 'test_jenkin_with_docker', url: 'https://github.com/soni1764/robot-jenkins'
             }
         }
 
@@ -35,22 +35,15 @@ pipeline {
                     bat """
                     docker run --rm --name %CONTAINER_NAME% ^
                         -v "${dockerResultsPath}:/testing/results" ^
-                        %IMAGE_NAME% robot --outputdir results --xunit results/xunit.xml tests/
+                        %IMAGE_NAME% robot --outputdir results tests/
                     """
                 }
             }
         }
 
-        stage('Publish Test Results') {
+        stage('Publish Robot Framework Report') {
             steps {
-                junit 'results/xunit.xml'
-                publishHTML([
-                    reportName: 'Robot Report',
-                    reportDir: 'results',
-                    reportFiles: 'report.html',
-                    keepAll: true,
-                    alwaysLinkToLastBuild: true
-                ])
+                robot outputPath: 'results'
             }
         }
     }
@@ -64,3 +57,7 @@ pipeline {
             echo '✅ Robot Framework test execution completed!'
         }
         failure {
+            echo '❌ Test run failed. Check logs and reports.'
+        }
+    }
+}
