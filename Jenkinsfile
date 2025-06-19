@@ -21,9 +21,18 @@ pipeline {
             }
         }
 
-        stage('Create Results Directory') {
+//         stage('Create Results Directory') {
+//             steps {
+//                 bat "mkdir %RESULTS_DIR%"
+//             }
+//         }
+
+        stage('Clean & Create Results Directory') {
             steps {
-                bat "mkdir %RESULTS_DIR%"
+                bat '''
+                    if exist %RESULTS_DIR% rmdir /s /q %RESULTS_DIR%
+                    mkdir %RESULTS_DIR%
+                '''
             }
         }
 
